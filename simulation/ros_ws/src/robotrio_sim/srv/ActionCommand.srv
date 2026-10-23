@@ -1,0 +1,10 @@
+string command
+string action_path
+string name
+uint32 repeat
+float64 pause
+string token
+---
+bool success
+string message
+string json_result

@@ -1,0 +1,67 @@
+# Simulation-only finite-torque, damped servos; no SetPosition/world fixture.
+l_hip_yaw_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 10.0, i: 0.0, d: 0.15}
+l_hip_roll_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 30.0, i: 0.0, d: 0.15}
+l_hip_pitch_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 30.0, i: 0.0, d: 0.15}
+l_knee_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 30.0, i: 0.0, d: 0.15}
+l_ank_pitch_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 40.0, i: 0.0, d: 0.15}
+l_ank_roll_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 40.0, i: 0.0, d: 0.15}
+l_sho_pitch_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 4.0, i: 0.0, d: 0.03}
+l_sho_roll_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 4.0, i: 0.0, d: 0.03}
+l_el_pitch_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 4.0, i: 0.0, d: 0.03}
+l_el_yaw_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 4.0, i: 0.0, d: 0.03}
+r_hip_yaw_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 10.0, i: 0.0, d: 0.15}
+r_hip_roll_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 30.0, i: 0.0, d: 0.15}
+r_hip_pitch_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 30.0, i: 0.0, d: 0.15}
+r_knee_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 30.0, i: 0.0, d: 0.15}
+r_ank_pitch_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 40.0, i: 0.0, d: 0.15}
+r_ank_roll_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 40.0, i: 0.0, d: 0.15}
+r_sho_pitch_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 4.0, i: 0.0, d: 0.03}
+r_sho_roll_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 4.0, i: 0.0, d: 0.03}
+r_el_pitch_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 4.0, i: 0.0, d: 0.03}
+r_el_yaw_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 4.0, i: 0.0, d: 0.03}
+head_pan_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 1.0, i: 0.0, d: 0.002}
+head_tilt_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 1.0, i: 0.0, d: 0.002}

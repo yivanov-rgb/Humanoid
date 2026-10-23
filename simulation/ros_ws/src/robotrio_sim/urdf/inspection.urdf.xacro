@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<robot name="ainex" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find ainex_description)/urdf/ainex.xacro"/>
+  <xacro:arg name="anchored" default="false"/>
+  <!-- Deliberately anchored inspection fixture. The feet hang above the floor.
+       This isolates joint control/camera checks from biped balance and is not
+       a walking or physical grasp test. The upstream files remain unchanged. -->
+  <xacro:if value="$(arg anchored)">
+    <link name="world"/>
+    <joint name="inspection_world_mount" type="fixed">
+      <parent link="world"/>
+      <child link="base_link"/>
+      <origin xyz="0 0 0.40" rpy="0 0 0"/>
+    </joint>
+  </xacro:if>
+</robot>

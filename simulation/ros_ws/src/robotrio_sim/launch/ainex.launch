@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="gui" default="false"/>
+  <arg name="paused" default="false"/>
+  <arg name="anchored" default="false"/>
+  <arg name="enable_actions" default="true"/>
+  <arg name="action_path" default="/actions"/>
+  <arg name="servo_config" default="$(find ainex_kinematics)/config/servo_controller.yaml"/>
+  <arg name="spawn_z" default="$(eval 0.0 if arg('anchored') else 0.24)"/>
+  <arg name="world" default="$(find robotrio_sim)/worlds/inspection.world"/>
+  <param name="/robotrio_sim/world_file" value="$(arg world)"/>
+  <arg name="spawn_joint_args" default="$(eval '-J l_sho_roll 1.403 -J l_el_yaw -1.226 -J r_sho_roll -1.403 -J r_el_yaw 1.226' if arg('anchored') else '')"/>
+  <!-- No ainex_bringup/base or ainex_controller: those launch hardware nodes.
+       Only the model, Gazebo plugins and effort joint controllers are used. -->
+  <param name="/robotrio_sim/mode"
+         value="$(eval 'anchored_inspection' if arg('anchored') else 'dynamic_experiment')"/>
+  <param name="robot_description"
+         command="$(find robotrio_sim)/scripts/robot_description.py '$(find robotrio_sim)/urdf/inspection.urdf.xacro' 'anchored:=$(arg anchored)' 'init_actions:=$(arg action_path)' 'init_servo_config:=$(arg servo_config)'"/>
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(arg world)"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="paused" value="$(eval arg('paused') if arg('anchored') else True)"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="extra_gazebo_args" value="--seed 42"/>
+  </include>
+  <node name="ainex_spawner" pkg="gazebo_ros" type="spawn_model"
+        output="screen" required="false"
+        args="-urdf -param robot_description -model ainex -x 0 -y 0 -z $(arg spawn_z)
+              $(arg spawn_joint_args)"/>
+  <include file="$(find ainex_gazebo)/launch/position_controller.launch"/>
+  <rosparam unless="$(arg anchored)" file="$(find robotrio_sim)/config/standing_controllers.yaml" command="load"/>
+  <rosparam file="$(find robotrio_sim)/config/gripper_controllers.yaml" command="load"/>
+  <node unless="$(arg anchored)" pkg="robotrio_sim" type="prepare_start.py"
+        name="prepare_start" output="screen">
+    <param name="action_path" value="$(arg action_path)"/>
+    <param name="servo_config" value="$(arg servo_config)"/>
+  </node>
+  <node if="$(arg enable_actions)" name="robotrio_sim_actions" pkg="robotrio_sim"
+        type="action_server.py" output="screen">
+    <param name="action_path" value="$(arg action_path)"/>
+    <param name="servo_config" value="$(arg servo_config)"/>
+  </node>
+</launch>

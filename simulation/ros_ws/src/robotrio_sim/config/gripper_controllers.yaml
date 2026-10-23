@@ -1,0 +1,8 @@
+# Light 13.5 g fingers need lower gains than the arm links at a 1 ms step.
+# Simulation only: preserve active control, do not lock the joints.
+l_gripper_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 0.5, i: 0.0, d: 0.001}
+r_gripper_controller:
+  type: effort_controllers/JointPositionController
+  pid: {p: 0.5, i: 0.0, d: 0.001}

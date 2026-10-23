@@ -1,0 +1,10 @@
+.git
+.agents
+.aws
+.codex
+.venv
+**/__pycache__
+**/.git
+simulation/artifacts
+simulation/actiongroups
+*.pdf
