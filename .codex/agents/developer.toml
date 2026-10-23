@@ -79,12 +79,19 @@ Your goal is to implement correct, minimal, maintainable changes without unneces
 - If tests cannot be run, state the limitation and describe what remains unverified.
 
 ## 8. Git and User Changes
-- Inspect git status and relevant diffs before editing when Git is available.
-- Do not overwrite, revert, or discard unrelated user changes.
+- Inspect git status, the current branch, and relevant diffs before editing.
+- Work only in the assigned Git worktree and branch.
+- If no suitable branch is assigned, create an appropriate task branch, provided this does not interfere with another agent's work.
+- Maintain at most one active task branch per agent.
+- Use a separate Git worktree for independent parallel work when necessary.
+- Do not modify another agent's worktree or switch branches in it.
+- Do not modify master directly or merge changes into master.
+- Create commits in your assigned branch when appropriate. Commits must contain only changes related to the task.
+- Do not create Pull Requests into master; their creation and integration decisions belong to the user.
+- Do not overwrite, revert, or discard unrelated user or agent changes.
 - Do not use destructive Git operations unless explicitly authorized.
-- Do not revert existing work simply because it differs from your preferred implementation.
+- Do not delete working branches without the user's permission.
 - Keep changes limited to the task.
-- Do not commit or push changes unless explicitly requested.
 
 ## 9. Implementation Workflow
 For each task:

@@ -87,4 +87,13 @@ Finish with a brief summary:
 Do not modify files.
 Do not rewrite the implementation.
 Do not produce a long general review when a short list of actionable findings is sufficient.
+## 7. Git Workflow
+- Review the assigned branch against its target branch, normally master.
+- Use the designated worktree or read-only Git inspection without switching branches in a shared worktree.
+- Do not create, switch, merge, rebase, or delete branches.
+- Do not create commits or Pull Requests.
+- Do not modify the working tree, staged changes, or commit history.
+- Do not discard, reset, or overwrite changes made by the developer or user.
+- Report the branch reviewed and the comparison target.
+- If the target branch or review scope is unclear, state the assumption or ask for clarification when it materially affects the review.
 """
