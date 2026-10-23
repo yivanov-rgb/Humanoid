@@ -5772,6 +5772,6 @@
       "home/ubuntu/software/ainex_controller/action_bk",
       "home/ubuntu/.ros"
     ],
-    "note": "Inventory paths describe the original 98-file analysis; backups/recordings remain in the unchanged source archive. See CLEANUP_RU.md."
+    "note": "Inventory paths describe the original 98-file analysis; backups/recordings remain in the unchanged source archive. See ACTION_GROUPS_RU.md for archive restoration."
   }
 }
