@@ -1,24 +1,21 @@
 #!/usr/bin/env python3
-"""Robotrio/AiNex ROS1: быстрый прототип подхода и захвата по AprilTag.
+"""Robotrio/AiNex ROS1: подход и измерение блока после подсаживания.
 
 Среда: существующий контейнер ainex, ROS Noetic, детектор HiWonder с corners.
 По умолчанию только наблюдение: MotionManager даже не создаётся.
 Голова при исполнении: pan=500, tilt=330. Подход по X/Y, затем
-forward_one_step x2 и захват рукой, выбранной по ID.
-ID 0 -> clamp_left; ID 1 -> clamp_right; затем один place_block для обоих.
-Два ID: --execute --ids 0 1. Между захватами нет stand или размещения.
-После clamp_left командная поза левой руки сохраняется при движениях
-и clamp_right; перед place_block это ограничение снимается.
---demo-transfer: после обоих захватов удерживать обе руки, выполнить
-turn_right x8 с паузой 0.1 с после каждого, forward x12, затем place_block.
-Это последовательность, указанная пользователем; шаги forward не подменяются.
-Число повторов поворота настраивается через --demo-turns (по умолчанию 8).
+forward_one_step x2, родной присед и новое измерение.
+После подшагов видимость метки не требуется: она возвращается после приседа.
+ID 0 -> кадр 1 clamp_left; ID 1 -> кадры 1–2 clamp_right.
+Затем --execute останавливается с CALIBRATION_REQUIRED: подтверждённого
+критерия финального захвата пока нет. Свежие x/y записываются с timestamp,
+но не разрешают захват и не являются TF-коррекцией или калибровкой.
+При --ids 0 1 остановка происходит на первой цели; второй захват,
+--demo-transfer и размещение пока недоступны. Робот остаётся в приседе.
 IDs сервоприводов читаются из установленного servo_controller.yaml.
 Во время подхода и двух финальных шагов голова зафиксирована в 500/330.
 Для каждого ID используются только его явно выбранные пороги.
-Без --demo-transfer place_block выполняется на месте.
-Демо-перенос выполняет заданные движения без навигации и проверки препятствий.
-Возврат run_action означает конец воспроизведения, не подтверждение захвата.
+Возврат run_action означает конец воспроизведения, не обратную связь о позе.
 
 Примеры внутри контейнера:
   python3 tag_grab.py --ids 0
@@ -36,8 +33,8 @@ IDs сервоприводов читаются из установленног�
           --final-steps 2 --max-moves 40 --lost-timeout 10
 NO_TARGET -> ожидание, затем выход; слепых шагов назад нет.
 Ctrl+C запрещает следующие команды и просит остановку между кадрами .d6a.
-Пользователь подтвердил два захвата и общее размещение с этими порогами.
-Исправленный демо-перенос с двумя кубами ещё не проверен на роботе.
+Прежний сценарий двух захватов пользователь подтвердил с этими порогами.
+Новая последовательность с паузой в приседе на роботе не проверена.
 По проверке пользователя больший X соответствует положению левее:
 для правой руки используется меньший X, чем для левой.
 """
@@ -49,7 +46,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-SCRIPT_VERSION = 'tag-grab-2026-10-05-right8-forward12'
+SCRIPT_VERSION = 'tag-grab-2026-10-23-post-crouch-measurement'
 
 
 @dataclass(frozen=True)
@@ -212,14 +209,11 @@ class Runner:
 
         actions = {"stand", "move_left", "move_right",
                    "forward_one_step", "back_step"}
-        actions.update('clamp_left' if i == 0 else 'clamp_right'
-                       for i in self.args.ids)
+        # Пока исполняется только первая цель: после приседа нет
+        # подтверждённого критерия продолжения финального захвата.
+        actions.add('clamp_left_crouch' if self.args.ids[0] == 0
+                    else 'clamp_right_crouch')
         if len(self.args.ids) == 2:
-            actions.add("place_block")
-            if self.args.demo_transfer:
-                actions.add('forward')
-                if self.args.demo_turns:
-                    actions.add('turn_right')
             import rospkg
             import yaml
             config_path = (Path(rospkg.RosPack().get_path('ainex_kinematics'))
@@ -312,6 +306,46 @@ class Runner:
         self.fresh_frames()
         self.ros.loginfo("HEAD: pan=500 tilt=330")
 
+    def observation_xy(self, obs):
+        image_age = (self.ros.Time.now().to_nsec() - obs.stamp) / 1e9
+        if (time.monotonic() - obs.received > self.args.max_age
+                or image_age < -0.2 or image_age > self.args.max_age
+                or obs.xy is None):
+            return None
+        x, y = obs.xy
+        return (x, y) if 0 <= x < 640 and 0 <= y < 480 else None
+
+    def measure_after_crouch(self):
+        # action() уже сбросил буфер ПОСЛЕ приседа и выдержки. Пиксельные
+        # пороги стойки здесь неприменимы; серия кадров не доказывает,
+        # что блок находится в области захвата или неподвижен.
+        serial, measurements, previous_received = 0, [], None
+        deadline = time.monotonic() + min(self.args.timeout, self.args.lost_timeout)
+        while not self.ros.is_shutdown():
+            if time.monotonic() > deadline:
+                raise RuntimeError(
+                    "ID %d: нет серии свежих измерений после подсаживания"
+                    % self.target)
+            obs = self.frames.wait_new(serial)
+            if obs is None:
+                continue
+            serial = obs.serial
+            xy = self.observation_xy(obs)
+            if xy is None:
+                measurements, previous_received = [], None
+                continue
+            if (previous_received is not None
+                    and obs.received - previous_received > self.args.max_age):
+                measurements = []
+            previous_received = obs.received
+            measurements.append((obs.stamp, *xy))
+            self.ros.loginfo(
+                "POST_CROUCH_MEASUREMENT ID=%d stamp=%d x=%.1f y=%.1f sample=%d/%d",
+                self.target, obs.stamp, *xy, len(measurements), self.args.stable_frames)
+            if len(measurements) >= self.args.stable_frames:
+                return measurements
+        self.check_running()
+
     def approach(self, target):
         self.target = target
         self.fresh_frames()
@@ -332,17 +366,12 @@ class Runner:
                 continue
             serial = obs.serial
             now = time.monotonic()
-            image_age = (self.ros.Time.now().to_nsec() - obs.stamp) / 1e9
-            if (now - obs.received > self.args.max_age
-                    or image_age < -0.2 or image_age > self.args.max_age
-                    or obs.xy is None):
+            xy = self.observation_xy(obs)
+            if xy is None:
                 streak, previous = 0, None
                 self.ros.loginfo_throttle(1, "ID=%d WAIT_TARGET", target)
                 continue
-            x, y = obs.xy
-            if not (0 <= x < 640 and 0 <= y < 480):
-                streak, previous = 0, None
-                continue
+            x, y = xy
             last_seen = now
             decision = decide(x, y, bounds)
             streak = streak + 1 if decision == previous else 1
@@ -370,39 +399,32 @@ class Runner:
             self.ros.loginfo("DRY_RUN: команды приводам не отправляются")
             self.approach(self.args.ids[0])
             return
+        if not (self.args.prepare_only or self.args.approach_only):
+            self.ros.logwarn(
+                "CALIBRATION_REQUIRED: после подшагов, штатного приседа и измерения "
+                "сценарий остановится в приседе; финальный захват, второй захват "
+                "и перенос недоступны без подтверждённого критерия")
         self.prepare()
         if self.args.prepare_only:
             self.ros.loginfo("PREPARED: можно измерять пиксели при голове 500/330")
             return
-        for index, target in enumerate(self.args.ids):
-            self.head_locked = True
-            if index > 0:
-                self.set_head()
-            self.approach(target)
-            if self.args.approach_only:
-                self.ros.loginfo("APPROACH_ONLY: остановка до финальных шагов и захвата")
-                return
-            for _ in range(self.args.final_steps):
-                self.action("forward_one_step")
-            # Захват может иметь свою позу головы. Защищена только уже
-            # занятая рука; голова и вторая рука исполняют штатный захват.
-            self.head_locked = False
-            self.action('clamp_left' if target == 0 else 'clamp_right')
-            self.ros.loginfo(
-                "GRASP_ACTION_COMPLETED ID=%d HAND=%s (без проверки наличия куба)",
-                target, 'LEFT' if target == 0 else 'RIGHT')
-            if index < len(self.args.ids) - 1:
-                self.hold_left_arm()
-        if len(self.args.ids) == 2:
-            self.check_running()
-            if self.args.demo_transfer:
-                self.demo_transfer()
-            self.check_running()
-            self.held_servos.clear()
-            self.action('place_block')
-            self.ros.loginfo('DONE: оба захвата и общий place_block завершены')
-        else:
-            self.ros.loginfo('DONE: одиночный захват завершён, размещения нет')
+        target = self.args.ids[0]
+        self.head_locked = True
+        self.approach(target)
+        if self.args.approach_only:
+            self.ros.loginfo("APPROACH_ONLY: остановка до финальных шагов и захвата")
+            return
+        for _ in range(self.args.final_steps):
+            self.action("forward_one_step")
+        # Потеря видимости после подшагов ожидаема. Измеряем только после
+        # родного приседа; уже занятая рука остаётся защищена guard-ом.
+        self.head_locked = False
+        self.action('clamp_left_crouch' if target == 0 else 'clamp_right_crouch')
+        measurements = self.measure_after_crouch()
+        raise RuntimeError(
+            "CALIBRATION_REQUIRED ID=%d: измерения после подсаживания "
+            "(stamp_ns, x, y)=%s; критерий положения блока и коррекция "
+            "не откалиброваны, финальный захват не выполнен" % (target, measurements))
 
 
 def arguments(argv=None):
@@ -410,13 +432,15 @@ def arguments(argv=None):
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--version', action='version', version=SCRIPT_VERSION)
     p.add_argument("--ids", nargs="+", type=int, default=[0])
-    p.add_argument("--execute", action="store_true", help="включить реальные движения")
+    p.add_argument("--execute", action="store_true",
+                   help="реальные движения до приседа/измерения; затем остановка "
+                        "CALIBRATION_REQUIRED без финального захвата")
     p.add_argument('--demo-transfer', action='store_true',
-                   help='после двух захватов выполнить 8 turn_right с паузой 0.1 с, '
-                        '12 forward и place_block')
+                   help='сохранённый интерфейс переноса; сейчас недоступен: '
+                        'сценарий остановится после первого приседа/измерения')
     p.add_argument('--demo-turns', type=int, default=8,
-                   help='число turn_right в --demo-transfer (по умолчанию 8; '
-                        '0 — только 12 forward, для отдельной проверки)')
+                   help='сохранённое число turn_right в --demo-transfer '
+                        '(по умолчанию 8); перенос сейчас недоступен')
     p.add_argument("--prepare-only", action="store_true", help="только stand и голова 500/330")
     p.add_argument("--approach-only", action="store_true", help="остановиться при READY, без захвата")
     p.add_argument("--topic", default="/tag_detections")
