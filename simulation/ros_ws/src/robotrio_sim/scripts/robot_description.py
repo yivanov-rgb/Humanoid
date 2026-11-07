@@ -13,7 +13,7 @@ import numpy as np
 import rospkg
 import yaml
 from robotrio_sim.action_runtime import ServoMap, load_action
-from robotrio_sim.initial_pose import align_shoulder_axes, mount_camera_on_head, origin, rotation
+from robotrio_sim.initial_pose import align_servo_model, mount_camera_on_head, origin, rotation
 
 arguments = sys.argv[1:]
 settings = {}
@@ -24,7 +24,7 @@ for key in ('init_actions', 'init_servo_config'):
         arguments.remove(matches[0])
 xml = subprocess.check_output(['xacro'] + arguments, universal_newlines=True)
 robot = ET.fromstring(xml)
-align_shoulder_axes(robot)
+align_servo_model(robot)
 mount_camera_on_head(robot)
 # Tiny finger inertias cannot use the arm's large, discontinuous dry friction.
 # ODE joint damping is implicit; retain a controllable revolute joint.

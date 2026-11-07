@@ -8,19 +8,33 @@ import numpy as np
 from .action_runtime import ServoMap, load_action
 
 
-def align_shoulder_axes(robot):
-    """CAD shoulder roll axes oppose hardware pulse directions (sim only).
+def align_servo_model(robot):
+    """Apply the operator's physical direction/pose checks to the CAD model.
 
-    The upstream Gazebo spawn uses negative left / positive right roll for
-    lowered arms, whereas hardware stand pulses produce the opposite angles.
-    Reverse these CAD axes without modifying hardware calibration or d6a files.
+    Joint names and servo IDs stay unchanged: *_el_pitch rotates the forearm,
+    while *_el_yaw bends the elbow in this CAD chain. Only simulation axes and
+    pulse zero references change; hardware calibration and actions stay intact.
     """
-    for name in ('l_sho_roll', 'r_sho_roll'):
+    axes = (
+        ('l_ank_roll', '1 0 0', '-1 0 0'),
+        ('l_sho_roll', '1 0 0', '-1 0 0'),
+        ('r_sho_roll', '1 0 0', '-1 0 0'),
+        ('r_sho_pitch', '0 -1 0', '0 1 0'),
+        ('l_el_pitch', '0 -1 0', '0 1 0'),
+        ('head_pan', '0 0 -1', '0 0 1'),
+    )
+    for name, upstream, corrected in axes:
         joint = robot.find("joint[@name='%s']" % name)
         axis = joint.find('axis')
-        if axis.get('xyz') != '1 0 0':
-            raise ValueError('Unexpected upstream shoulder axis: ' + name)
-        axis.set('xyz', '-1 0 0')
+        if axis.get('xyz') != upstream:
+            raise ValueError('Unexpected upstream servo axis: ' + name)
+        axis.set('xyz', corrected)
+    # Shoulder zero: upper arm parallel to body in the forward/back plane.
+    # Elbow references: left 148 / right 850 are 90 degrees; 375 pulses = 90 deg.
+    for name, pulse in (
+            ('l_sho_pitch', 725), ('r_sho_pitch', 275),
+            ('l_el_yaw', 148 + 375), ('r_el_yaw', 850 - 375)):
+        robot.find("joint[@name='%s']" % name).set('robotrio_servo_init', str(pulse))
 
 
 def mount_camera_on_head(robot):

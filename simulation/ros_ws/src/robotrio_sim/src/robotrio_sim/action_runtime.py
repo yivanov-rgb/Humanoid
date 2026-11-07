@@ -43,11 +43,17 @@ class ServoMap:
         robot = ET.fromstring(robot_xml)
         limits = {}
         initial_angles = {}
+        model_initials = {}
         for joint in robot.findall('joint'):
             limit = joint.find('limit')
             if joint.get('type') == 'revolute' and limit is not None:
                 limits[joint.get('name')] = (float(limit.get('lower')), float(limit.get('upper')))
                 initial_angles[joint.get('name')] = float(joint.get('robotrio_initial_angle', '0'))
+                if joint.get('robotrio_servo_init') is not None:
+                    initial = integer(float(joint.get('robotrio_servo_init')), 'model initial pulse')
+                    if not 0 <= initial <= 1000:
+                        raise ValidationError('Model initial pulse must be 0..1000')
+                    model_initials[joint.get('name')] = initial
         self.servos = {}
         names = set()
         for controller in config.get('controllers', {}).values():
@@ -64,6 +70,7 @@ class ServoMap:
             if not all(0 <= value <= 1000 for value in (initial, raw_min, raw_max)) or raw_min == raw_max:
                 raise ValidationError('Calibration pulses must be 0..1000 with distinct min/max')
             coefficient = ENCODER_TICKS_PER_RADIAN * (-1 if raw_min > raw_max else 1)
+            initial = model_initials.get(name, initial)
             initial += initial_angles[name] * coefficient
             lower, upper = limits[name]
             if not all(math.isfinite(v) for v in (initial, lower, upper)) or lower >= upper:

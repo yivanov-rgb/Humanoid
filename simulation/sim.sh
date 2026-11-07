@@ -86,14 +86,6 @@ case "$command" in
         cd "$project_dir"
         docker build --pull -f simulation/Dockerfile -t "$image" .
         ;;
-    test)
-        exec "$project_dir/.venv/bin/python" -m unittest discover -s "$project_dir/tests" -v
-        ;;
-    test-container)
-        exec docker run --rm --network none \
-            --mount "type=bind,src=$project_dir,dst=/workspace,readonly" \
-            "$image" python -m unittest discover -s /workspace/tests -v
-        ;;
     smoke|up|gui)
         gui=false
         if [[ "$command" == gui ]]; then gui=true; fi
@@ -213,7 +205,7 @@ case "$command" in
         if [[ -n "$auth_dir" ]]; then cleanup_auth_dir "$auth_dir"; fi
         ;;
     *)
-        printf 'Usage: bash simulation/sim.sh {fetch|build|test|test-container|smoke|up|gui|shell|logs|status|action|list-actions|action-info|stop-action|line-follow|line-stop|line-view|stop}\n'
+        printf 'Usage: bash simulation/sim.sh {fetch|build|smoke|up|gui|shell|logs|status|action|list-actions|action-info|stop-action|line-follow|line-stop|line-view|stop}\n'
         printf '  up [--gui] [--anchored] [--actions-dir PATH]  Start free Gazebo (headless by default).\n'
         printf '  gui [--anchored] [--actions-dir PATH]        Start free Gazebo with local GUI.\n'
         printf '  ROBOTRIO_ACTIONS_DIR sets the default .d6a directory (otherwise simulation/actiongroups).\n'
