@@ -32,10 +32,28 @@
       "sha256": "fd2475fade225aabcf3ae16ea4991867ade5b08c1e4eaf04e2ede0184ce7bbf5"
     },
     {
+      "name": "clamp_left_from_crouch",
+      "source": "robot/ActionGroups/clamp_left_from_crouch.d6a",
+      "destination": "/actions/clamp_left_from_crouch.d6a",
+      "sha256": "d8b86b62fd0a4cd379ede8c569f105d09d6075182396de867f5eaef24fd16a00"
+    },
+    {
       "name": "clamp_right",
       "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/clamp_right.d6a",
       "destination": "/actions/clamp_right.d6a",
       "sha256": "48bdce21104192cbc792c6c8e685caa3c276fab9c7ff4a0ea2541f9758fa875c"
+    },
+    {
+      "name": "clamp_right_crouch",
+      "source": "robot/ActionGroups/clamp_right_crouch.d6a",
+      "destination": "/actions/clamp_right_crouch.d6a",
+      "sha256": "a41f8480382107033247a94ae8e6543f7c5c93f9352e31c1a51efceaba436602"
+    },
+    {
+      "name": "clamp_right_from_crouch",
+      "source": "robot/ActionGroups/clamp_right_from_crouch.d6a",
+      "destination": "/actions/clamp_right_from_crouch.d6a",
+      "sha256": "9b7a94a805e22d8584dad1b41ef496a58b8af6198e8d6e35c36bcce4eee91682"
     },
     {
       "name": "climb_stairs",
@@ -54,6 +72,12 @@
       "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/crawl_right.d6a",
       "destination": "/actions/crawl_right.d6a",
       "sha256": "2760d2eeab84635fdd5083e69a48031a7e5c4b0b6117fe1e71769aa0bb35811b"
+    },
+    {
+      "name": "crouch",
+      "source": "robot/ActionGroups/crouch.d6a",
+      "destination": "/actions/crouch.d6a",
+      "sha256": "2078b880752db1d1a65f7972e574b5fb2bcdf93c3ece454b507e8ba858ff2527"
     },
     {
       "name": "descend_stairs",
@@ -170,10 +194,22 @@
       "sha256": "0fc65a93d3ca347a48c43d64aeab6db9113650088326e7e421cd0f2fa20d1234"
     },
     {
+      "name": "move_left_from_crouch",
+      "source": "robot/ActionGroups/move_left_from_crouch.d6a",
+      "destination": "/actions/move_left_from_crouch.d6a",
+      "sha256": "d1155fe395fad44283b4dd49c39824736f8150a7e7fa097615e50bff26103f64"
+    },
+    {
       "name": "move_right",
       "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/move_right.d6a",
       "destination": "/actions/move_right.d6a",
       "sha256": "2c61704c12390473d903e6cd4b3f142bf1b9d87aa9121624da91cf2e501ba688"
+    },
+    {
+      "name": "move_right_from_crouch",
+      "source": "robot/ActionGroups/move_right_from_crouch.d6a",
+      "destination": "/actions/move_right_from_crouch.d6a",
+      "sha256": "5c9661895d40cd21de3bbf775021d29926db383a65124de5be5c976115c87439"
     },
     {
       "name": "move_up",

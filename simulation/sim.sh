@@ -132,8 +132,24 @@ case "$command" in
         options=(--network none --shm-size=512m --init
             --mount "type=bind,src=$project_dir,dst=/workspace,readonly"
             --mount "type=bind,src=$sim_dir/ros_ws/src/robotrio_sim,dst=/opt/ainex_ws/src/robotrio_sim,readonly"
-            --mount "type=bind,src=$actions_dir,dst=/actions,readonly"
             --mount "type=bind,src=$sim_dir/artifacts,dst=/workspace/simulation/artifacts")
+        if [[ "$actions_dir" == "$default_actions_dir" ]]; then
+            # Mount files individually to combine robot originals and derived
+            # actions without copies or writable changes to the source directory.
+            for action_file in "$actions_dir"/*.d6a \
+                "$project_dir/robot/ActionGroups/crouch.d6a" \
+                "$project_dir/robot/ActionGroups/clamp_right_crouch.d6a" \
+                "$project_dir/robot/ActionGroups/clamp_left_from_crouch.d6a" \
+                "$project_dir/robot/ActionGroups/clamp_right_from_crouch.d6a" \
+                "$project_dir/robot/ActionGroups/move_left_from_crouch.d6a" \
+                "$project_dir/robot/ActionGroups/move_right_from_crouch.d6a"; do
+                [[ -f "$action_file" && -r "$action_file" ]] || \
+                    fail "ActionGroup file is not readable: $action_file."
+                options+=(--mount "type=bind,src=$action_file,dst=/actions/${action_file##*/},readonly")
+            done
+        else
+            options+=(--mount "type=bind,src=$actions_dir,dst=/actions,readonly")
+        fi
         launch_args=("anchored:=$anchored")
         if [[ "$command" != smoke ]]; then
             printf 'Gazebo mode: %s\n' "$([[ "$anchored" == true ]] && printf 'ANCHORED (body fixed at 0.40 m)' || printf 'FREE (preparing and checking initial stand)')"
@@ -207,6 +223,8 @@ case "$command" in
         printf '  up [--gui] [--anchored] [--actions-dir PATH]  Start free Gazebo (headless by default).\n'
         printf '  gui [--anchored] [--actions-dir PATH]        Start free Gazebo with local GUI.\n'
         printf '  Default .d6a directory: %s\n' "${default_actions_dir#"$project_dir/"}"
+        printf '  The default /actions also includes crouch, clamp_right_crouch and clamp_left/right_from_crouch.\n'
+        printf '  move_left_from_crouch and move_right_from_crouch are also included.\n'
         printf '  ROBOTRIO_ACTIONS_DIR overrides the default .d6a directory.\n'
         printf '  --anchored explicitly fixes the body above ground; --free explicitly removes the fixture.\n'
         printf '  status prints initial_pose_ready/error; free actions wait for verified stand.\n'

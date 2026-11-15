@@ -52,16 +52,26 @@ Python, launch и мир подключены из проекта и досту�
 
 Все 48 исходных `.d6a` с робота хранятся в Git в каталоге
 `robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/`.
-Стенд по умолчанию подключает весь этот каталог только для чтения как `/actions`;
-копирование файлов и параметр `--actions-dir` не требуются.
+Стенд по умолчанию подключает эти файлы, четыре выделенные группы приседа
+и захвата и два боковых движения из приседа из `robot/ActionGroups/`
+только для чтения в `/actions`.
+Копирование файлов и параметр `--actions-dir` не требуются.
 [Список групп и SHA256](actiongroups_selection.json) содержит пути исходников
 (`source`) и файлов в контейнере (`destination`).
+Выделенные `crouch`, `clamp_right_crouch`, `clamp_left_from_crouch` и
+`clamp_right_from_crouch`, а также `move_left_from_crouch` и
+`move_right_from_crouch` доступны по имени без `--action-path`; всего
+в стандартном наборе 54 группы. Порядок проверки:
+[присед и захват](#проверка-приседа-и-захвата),
+[боковое движение из приседа](#проверка-бокового-движения-из-приседа).
 Для запуска свободной модели используется исходный `stand.d6a`, для линии —
 также `walk_ready`, `forward_one_step`, `forward`, `move_left`, `move_right`,
 `turn_left`, `turn_right`, `back_step`.
 Происхождение выгрузки описано в [справочнике](ACTION_GROUPS_RU.md#источники-и-формат).
 Локальные копии в `simulation/actiongroups/` и архивы в `simulation/artifacts/`
 по-прежнему не хранятся в Git; свой каталог можно выбрать через `--actions-dir`.
+При выборе другого каталога `/actions` содержит только его файлы;
+шесть дополнительных групп автоматически не добавляются.
 
 ## Ручной запуск и остановка
 
@@ -209,9 +219,11 @@ bash simulation/sim.sh stop-action
 ```
 
 После ручного запуска `gui --free` и проверки `initial_pose_ready: true`
-команда `list-actions` должна показать все 48 имён из
+команда `list-actions` должна показать все 54 имени из
 [списка](actiongroups_selection.json), включая `clamp_left`, `clamp_right`,
-`place_block` и `wave`. Завершайте проверку командой `bash simulation/sim.sh stop`
+`crouch`, `clamp_right_crouch`, оба `clamp_*_from_crouch`,
+оба `move_*_from_crouch`, `place_block` и `wave`.
+Завершайте проверку командой `bash simulation/sim.sh stop`
 по [порядку остановки](#ручной-запуск-и-остановка).
 
 Имя передаётся без `.d6a`. На старте GUI группы автоматически не проигрываются.
@@ -223,6 +235,120 @@ bash simulation/sim.sh stop-action
 Перед Reset World/Model/Time остановите действие; сброс позы не заменяет остановку.
 Группы задают все сервоприводы своих кадров: удержание руки из `tag_grab.py`
 в ручном проигрывателе не применяется автоматически.
+
+### Проверка приседа и захвата
+
+Четыре выделенных действия подключаются к стандартному `/actions` без
+копирования файлов, пересборки образа и изменения `--actions-dir`.
+Их состав и начальные позы
+описаны в [справочнике](ACTION_GROUPS_RU.md#присед-и-захват-из-приседа).
+Аппаратные сценарии распознавания здесь не запускаются.
+
+Если стенд был создан до подключения новых групп, сначала остановите свой
+стенд командой `bash simulation/sim.sh stop`, затем запустите заново вручную.
+Если стенд ещё не запущен, запустите его вручную по
+[порядку запуска](#ручной-запуск-и-остановка):
+
+```bash
+bash simulation/sim.sh gui --free
+```
+
+После запуска проверьте готовность
+начальной стойки: `initial_pose_ready: true`, пустой `initial_pose_error`.
+Остановите другие источники команд движения, затем проверьте список и данные:
+
+```bash
+bash simulation/sim.sh status
+bash simulation/sim.sh list-actions
+bash simulation/sim.sh action-info crouch
+bash simulation/sim.sh action-info clamp_left_from_crouch
+bash simulation/sim.sh action-info clamp_right_crouch
+bash simulation/sim.sh action-info clamp_right_from_crouch
+```
+
+Ожидаемые кадры и длительности: `crouch` — 1 / 1,0 с,
+`clamp_left_from_crouch` — 6 / 3,4 с, `clamp_right_crouch` — 2 / 2,0 с,
+`clamp_right_from_crouch` — 6 / 4,1 с.
+
+Левая последовательность; выполняйте команды по одной, осматривая позу
+после приседа и после захвата:
+
+```bash
+bash simulation/sim.sh action stand
+bash simulation/sim.sh action crouch
+bash simulation/sim.sh action clamp_left_from_crouch
+```
+
+Правая последовательность — отдельный опыт из штатной стойки:
+
+```bash
+bash simulation/sim.sh action stand
+bash simulation/sim.sh action clamp_right_crouch
+bash simulation/sim.sh action clamp_right_from_crouch
+```
+
+После приседа модель должна удерживать низкую позу; траектория выбранной
+руки к кубу ещё не выполняется.
+Продолжение выполняет захват выбранной рукой и штатный подъём; положение
+второй руки также задаётся группой. При падении или неожиданном движении
+остановите проверку. Проигрывание без куба показывает траекторию,
+но не подтверждает успешный захват.
+
+Остановка команд и завершение стенда:
+
+```bash
+bash simulation/sim.sh stop-action
+bash simulation/sim.sh stop
+docker ps -a --filter 'name=^/humanoid-ainex-sim$' --format 'table {{.Names}}\t{{.Status}}'
+```
+
+### Проверка бокового движения из приседа
+
+`move_right_from_crouch` и `move_left_from_crouch` — два новых действия
+по 2 кадра / 1,0 с. Они отводят наружу только соответствующее бедро
+на 50 pulse и возвращают его, сохраняя остальные значения `crouch`.
+[Состав кадров](ACTION_GROUPS_RU.md#боковое-движение-бедра-из-приседа).
+
+Проверку выполняет пользователь вручную. Если стенд уже работает,
+сначала остановите свой стенд командой `bash simulation/sim.sh stop`,
+чтобы при следующем запуске подключились новые файлы.
+Запустите GUI и убедитесь, что `status` показывает
+`initial_pose_ready: true` и пустой `initial_pose_error`:
+
+```bash
+bash simulation/sim.sh gui --free
+bash simulation/sim.sh status
+bash simulation/sim.sh list-actions
+bash simulation/sim.sh action-info move_right_from_crouch
+bash simulation/sim.sh action-info move_left_from_crouch
+```
+
+Остановите другие источники движения. Выполняйте команды по одной,
+осматривая позу после каждого действия. Правая последовательность:
+
+```bash
+bash simulation/sim.sh action crouch
+bash simulation/sim.sh action move_right_from_crouch
+```
+
+Левая последовательность — отдельный опыт после возврата в стойку:
+
+```bash
+bash simulation/sim.sh action stand
+bash simulation/sim.sh action crouch
+bash simulation/sim.sh action move_left_from_crouch
+```
+
+Ожидается отведение правого бедра ID 10: `500 → 550 → 500` или левого
+ID 9: `500 → 450 → 500` при сохранении приседа. Фактическое смещение
+по полу и устойчивость пока не проверены. При падении или неожиданном
+движении остановите проверку. Остановка команд и стенда:
+
+```bash
+bash simulation/sim.sh stop-action
+bash simulation/sim.sh stop
+docker ps -a --filter 'name=^/humanoid-ainex-sim$' --format 'table {{.Names}}\t{{.Status}}'
+```
 
 ### Проверка пробных движений правой руки
 
