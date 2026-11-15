@@ -296,7 +296,7 @@ python3 tag_track.py --id 1 --execute --pan-range 400 600 --tilt-range 400 600 -
 при выборе руки, подходе и приседе. Рука выбирается по повороту рисунка
 в изображении и фиксируется до конца этапа. После подхода по прежним порогам
 выбранной руки выполняются два `forward_one_step` (настраивается `--final-steps`
-от 0 до 2), затем `clamp_left_crouch` или `clamp_right_crouch`.
+от 0 до 2), затем `crouch` или `clamp_right_crouch`.
 Эти две группы должны быть установлены в `--action-path`;
 [команды копирования](#захват-по-apriltag-текущие-ограничения) приведены ниже.
 Нужен кадр 640×480. Финальные шаги и присед сохраняют прежнюю последовательность:
@@ -361,7 +361,7 @@ python3 -u tag_grab_approach.py --execute \
 `--prepare-only`, `--approach-only` и наблюдение без `--execute` сохраняются.
 
 Подсаживание выделено без изменения команд и длительности кадров:
-`ActionGroups/clamp_left_crouch.d6a` содержит кадр 1 исходного `clamp_left`
+`ActionGroups/crouch.d6a` содержит кадр 1 исходного `clamp_left`
 (1000 мс), `ActionGroups/clamp_right_crouch.d6a` — кадры 1–2 исходного
 `clamp_right` (1000 + 1000 мс). Исходные группы не изменены; последующие
 кадры захвата не воспроизводятся. Пауза на измерение добавлена после этих кадров.
@@ -370,10 +370,16 @@ python3 -u tag_grab_approach.py --execute \
 Например, после задания SSH-адреса робота (на ноутбуке, из корня проекта):
 
 ```bash
-scp robot/ActionGroups/clamp_left_crouch.d6a robot/ActionGroups/clamp_right_crouch.d6a "$ROBOT_SSH":/tmp/
-ssh "$ROBOT_SSH" 'docker cp /tmp/clamp_left_crouch.d6a ainex:/home/ubuntu/software/ainex_controller/ActionGroups/clamp_left_crouch.d6a'
+scp robot/ActionGroups/crouch.d6a robot/ActionGroups/clamp_right_crouch.d6a "$ROBOT_SSH":/tmp/
+ssh "$ROBOT_SSH" 'docker cp /tmp/crouch.d6a ainex:/home/ubuntu/software/ainex_controller/ActionGroups/crouch.d6a'
 ssh "$ROBOT_SSH" 'docker cp /tmp/clamp_right_crouch.d6a ainex:/home/ubuntu/software/ainex_controller/ActionGroups/clamp_right_crouch.d6a'
 ```
+
+`clamp_left_from_crouch.d6a` и `clamp_right_from_crouch.d6a` содержат
+продолжение исходных захватов после соответствующего приседа, включая подъём.
+Они подготовлены для [ручной проверки в симуляции](../simulation/README.md#проверка-приседа-и-захвата).
+Сценарии `tag_grab.py` и `tag_grab_approach.py` их пока не вызывают:
+остановка после приседа сохраняется.
 
 Буфер кадров сбрасывается существующим `action()` после завершения приседа
 и выдержки `--settle`. В журнал `POST_CROUCH_MEASUREMENT` записываются ID,

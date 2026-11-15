@@ -211,7 +211,7 @@ class Runner:
                    "forward_one_step", "back_step"}
         # Пока исполняется только первая цель: после приседа нет
         # подтверждённого критерия продолжения финального захвата.
-        actions.add('clamp_left_crouch' if self.args.ids[0] == 0
+        actions.add('crouch' if self.args.ids[0] == 0
                     else 'clamp_right_crouch')
         if len(self.args.ids) == 2:
             import rospkg
@@ -419,7 +419,7 @@ class Runner:
         # Потеря видимости после подшагов ожидаема. Измеряем только после
         # родного приседа; уже занятая рука остаётся защищена guard-ом.
         self.head_locked = False
-        self.action('clamp_left_crouch' if target == 0 else 'clamp_right_crouch')
+        self.action('crouch' if target == 0 else 'clamp_right_crouch')
         measurements = self.measure_after_crouch()
         raise RuntimeError(
             "CALIBRATION_REQUIRED ID=%d: измерения после подсаживания "

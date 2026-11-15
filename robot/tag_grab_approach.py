@@ -10,7 +10,7 @@
 
 При --execute: голова 500/330 -> stand -> выбор руки по свежим кадрам ->
 подход по прежним порогам выбранной руки -> два forward_one_step ->
-clamp_left_crouch или clamp_right_crouch. Голова остаётся в 500/330
+crouch или clamp_right_crouch. Голова остаётся в 500/330
 весь этап, выбранная рука больше не меняется. Финальное прицеливание,
 захват и подъём относятся ко второму этапу и здесь не выполняются.
 
@@ -194,7 +194,7 @@ class Runner:
         actions = {'stand'}
         if not self.args.prepare_only:
             actions.update(('move_left', 'move_right', 'forward_one_step', 'back_step',
-                            'clamp_left_crouch', 'clamp_right_crouch'))
+                            'crouch', 'clamp_right_crouch'))
         for name in sorted(actions):
             path = Path(self.args.action_path) / (name + '.d6a')
             if not path.is_file():
@@ -330,7 +330,7 @@ class Runner:
         # Как в исходном сценарии, после READY видимость может пропасть до приседа.
         for _ in range(self.args.final_steps):
             self.action('forward_one_step')
-        self.action('clamp_' + hand + '_crouch')
+        self.action('crouch' if hand == 'left' else 'clamp_right_crouch')
         self.ros.loginfo('CROUCHED: ID=0 HAND=%s HEAD=500/330; первый этап завершён', hand.upper())
 
 
