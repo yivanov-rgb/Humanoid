@@ -50,16 +50,18 @@ Python, launch и мир подключены из проекта и досту�
 
 ### Файлы ActionGroups
 
-`simulation/actiongroups/` и `simulation/artifacts/` не хранят рабочие данные
-в Git. Команды `fetch` и `build` загружают исходники и собирают образ, но
-не получают `.d6a` с физического робота. Для запуска свободной модели нужен
-`stand.d6a`, для линии — также группы из
-[выборки](actiongroups_selection.json): `walk_ready`, `forward_one_step`,
-`forward`, `move_left`, `move_right`, `turn_left`, `turn_right`, `back_step`.
-Используйте экспорт исходных групп с робота, указав его каталог через
-`--actions-dir` при запуске; [происхождение экспорта и восстановление архива](ACTION_GROUPS_RU.md#источники-и-формат).
-Если девять файлов уже скопированы в `simulation/actiongroups/`, параметр
-не требуется. Сам архив и выгрузка должны быть получены отдельно.
+Все 48 исходных `.d6a` с робота хранятся в Git в каталоге
+`robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/`.
+Стенд по умолчанию подключает весь этот каталог только для чтения как `/actions`;
+копирование файлов и параметр `--actions-dir` не требуются.
+[Список групп и SHA256](actiongroups_selection.json) содержит пути исходников
+(`source`) и файлов в контейнере (`destination`).
+Для запуска свободной модели используется исходный `stand.d6a`, для линии —
+также `walk_ready`, `forward_one_step`, `forward`, `move_left`, `move_right`,
+`turn_left`, `turn_right`, `back_step`.
+Происхождение выгрузки описано в [справочнике](ACTION_GROUPS_RU.md#источники-и-формат).
+Локальные копии в `simulation/actiongroups/` и архивы в `simulation/artifacts/`
+по-прежнему не хранятся в Git; свой каталог можно выбрать через `--actions-dir`.
 
 ## Ручной запуск и остановка
 
@@ -178,8 +180,8 @@ ID 21 закрывается при увеличении pulse, ID 22 — при
 
 ## ActionGroups
 
-Каталог по умолчанию — `simulation/actiongroups`; наличие девяти действий
-линии проверяйте при [подготовке файлов](#файлы-actiongroups).
+По умолчанию подключены все 48 исходных групп из
+`robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/`.
 Для другого каталога передайте непосредственно папку с файлами `.d6a`:
 
 ```bash
@@ -205,6 +207,12 @@ bash simulation/sim.sh action forward --repeat 3
 bash simulation/sim.sh action turn_right --repeat 8 --pause 0.1
 bash simulation/sim.sh stop-action
 ```
+
+После ручного запуска `gui --free` и проверки `initial_pose_ready: true`
+команда `list-actions` должна показать все 48 имён из
+[списка](actiongroups_selection.json), включая `clamp_left`, `clamp_right`,
+`place_block` и `wave`. Завершайте проверку командой `bash simulation/sim.sh stop`
+по [порядку остановки](#ручной-запуск-и-остановка).
 
 Имя передаётся без `.d6a`. На старте GUI группы автоматически не проигрываются.
 `action-info` показывает кадры, длительность, сервоприводы и хеш. Проигрыватель

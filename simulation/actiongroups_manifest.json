@@ -3,7 +3,7 @@
   "analysis_date": "2026-10-18",
   "analysis_scope": "Read-only SQLite/content analysis; no tests, compilation, ROS, Gazebo or robot motions were run.",
   "validation_limits": "Checks cover database layout, indices, durations, integer pulses 0..1000 and hashes. They do not establish URDF compatibility, motion meaning, displacement, balance or grasp success.",
-  "preferred_source_directory": "simulation/artifacts/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups",
+  "preferred_source_directory": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups",
   "source_archive": {
     "path": "simulation/artifacts/ainex_d6a.tar.gz",
     "sha256": "d775e97e502951c913c0aa0ad392f1c85307c9da0c2d10eb674edfb10a49eda7",

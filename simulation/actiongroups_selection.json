@@ -1,59 +1,293 @@
 {
-  "source": "simulation/artifacts/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups",
+  "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups",
   "actions": [
     {
-      "name": "stand",
-      "source": "simulation/artifacts/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/stand.d6a",
-      "destination": "simulation/actiongroups/stand.d6a",
-      "sha256": "a5ea33a29e2ef231aeec07e187151ef3c99e0b6ead92a3340dee8785ef30a718"
+      "name": "0",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/0.d6a",
+      "destination": "/actions/0.d6a",
+      "sha256": "906e2f3d7041a7d53627b16be506b8895da33b975cff694e0acc871d266c068a"
     },
     {
-      "name": "walk_ready",
-      "source": "simulation/artifacts/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/walk_ready.d6a",
-      "destination": "simulation/actiongroups/walk_ready.d6a",
-      "sha256": "125766caff5ca1931982932ed2128bcf0b3b811d1af2d0cccc77e320b2ac76b9"
+      "name": "back",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/back.d6a",
+      "destination": "/actions/back.d6a",
+      "sha256": "1fc7076a56de5bf9dd4c6fa1d2681594b0988a4952618e388bce7173cc576626"
     },
     {
-      "name": "forward_one_step",
-      "source": "simulation/artifacts/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/forward_one_step.d6a",
-      "destination": "simulation/actiongroups/forward_one_step.d6a",
-      "sha256": "5ce33b339f0ee4fc73f6c32d2845bbbae996c8a25b1adb09bfe7d32de9b03ce6"
+      "name": "back_step",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/back_step.d6a",
+      "destination": "/actions/back_step.d6a",
+      "sha256": "b410c2b34b443d0beec77988f655eb15f3fdfcf89df217a5ed67039ea6c4aa2b"
+    },
+    {
+      "name": "calib",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/calib.d6a",
+      "destination": "/actions/calib.d6a",
+      "sha256": "64359cf6df61a71a880cf98ffa15278e1320654c754dca1dbb621d55d0936258"
+    },
+    {
+      "name": "clamp_left",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/clamp_left.d6a",
+      "destination": "/actions/clamp_left.d6a",
+      "sha256": "fd2475fade225aabcf3ae16ea4991867ade5b08c1e4eaf04e2ede0184ce7bbf5"
+    },
+    {
+      "name": "clamp_right",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/clamp_right.d6a",
+      "destination": "/actions/clamp_right.d6a",
+      "sha256": "48bdce21104192cbc792c6c8e685caa3c276fab9c7ff4a0ea2541f9758fa875c"
+    },
+    {
+      "name": "climb_stairs",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/climb_stairs.d6a",
+      "destination": "/actions/climb_stairs.d6a",
+      "sha256": "03ded7fdcbbcf8d8976aaec8b2b9f87991e76ef51f3a0dd143267e53d1dc7607"
+    },
+    {
+      "name": "crawl_left",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/crawl_left.d6a",
+      "destination": "/actions/crawl_left.d6a",
+      "sha256": "d918adf96072cfc2aa0489439b86ce03ff74caa8a1ce577c6e8ce07ea9490ab9"
+    },
+    {
+      "name": "crawl_right",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/crawl_right.d6a",
+      "destination": "/actions/crawl_right.d6a",
+      "sha256": "2760d2eeab84635fdd5083e69a48031a7e5c4b0b6117fe1e71769aa0bb35811b"
+    },
+    {
+      "name": "descend_stairs",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/descend_stairs.d6a",
+      "destination": "/actions/descend_stairs.d6a",
+      "sha256": "36a0472031b0208cc3ec0bed810c423c3f030d226c5540d6cdcf1b53f7a9691c"
     },
     {
       "name": "forward",
-      "source": "simulation/artifacts/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/forward.d6a",
-      "destination": "simulation/actiongroups/forward.d6a",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/forward.d6a",
+      "destination": "/actions/forward.d6a",
       "sha256": "fbe3e1ed5e93290a50d17a459f595747b1bb295432a3fc4eb468ac00d82c9643"
     },
     {
-      "name": "turn_left",
-      "source": "simulation/artifacts/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/turn_left.d6a",
-      "destination": "simulation/actiongroups/turn_left.d6a",
-      "sha256": "6136e924895118f21fdffac464a78fbe4aca0c11ce6cb082f6158cc0e2311b69"
+      "name": "forward_one_step",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/forward_one_step.d6a",
+      "destination": "/actions/forward_one_step.d6a",
+      "sha256": "5ce33b339f0ee4fc73f6c32d2845bbbae996c8a25b1adb09bfe7d32de9b03ce6"
     },
     {
-      "name": "turn_right",
-      "source": "simulation/artifacts/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/turn_right.d6a",
-      "destination": "simulation/actiongroups/turn_right.d6a",
-      "sha256": "95cc2b16d29f64889ed683923a8c1a7d8d04022c840e05d81ad3d8d9da1cc39a"
+      "name": "forward_step",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/forward_step.d6a",
+      "destination": "/actions/forward_step.d6a",
+      "sha256": "1f9309a1704dfbbed9e02b9d1942cfa5955130ac450a3d892a4a1f80b88dbb7b"
+    },
+    {
+      "name": "go_forward_low",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/go_forward_low.d6a",
+      "destination": "/actions/go_forward_low.d6a",
+      "sha256": "887f92b901ab58b03164bd96f038bd86818d63c55fe6285d0654c12e6b7dfcf5"
+    },
+    {
+      "name": "go_turn_left",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/go_turn_left.d6a",
+      "destination": "/actions/go_turn_left.d6a",
+      "sha256": "a293f6451d7178e465944b844e982d6579a244a997582c63e78079188e2b6188"
+    },
+    {
+      "name": "go_turn_left_20",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/go_turn_left_20.d6a",
+      "destination": "/actions/go_turn_left_20.d6a",
+      "sha256": "47a3d4d3aaa789ba66c1e936bc4a3a96fb130f8cdc82e953c2e54f19f78e1f9d"
+    },
+    {
+      "name": "go_turn_left_low",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/go_turn_left_low.d6a",
+      "destination": "/actions/go_turn_left_low.d6a",
+      "sha256": "5f3f4c46afaf81e0aaea0e4b2e9f0a41820391419a7e590f1518a365aded3c42"
+    },
+    {
+      "name": "go_turn_right",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/go_turn_right.d6a",
+      "destination": "/actions/go_turn_right.d6a",
+      "sha256": "9289105319ef6961bca5a5e01d6882d704da1b035bfef0d1d08a7cd58e66ac93"
+    },
+    {
+      "name": "go_turn_right_20",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/go_turn_right_20.d6a",
+      "destination": "/actions/go_turn_right_20.d6a",
+      "sha256": "c6f3673122ef711f078cee82f919e5cdfe8216666cdc0c68bbe601300fe2b4ca"
+    },
+    {
+      "name": "go_turn_right_low",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/go_turn_right_low.d6a",
+      "destination": "/actions/go_turn_right_low.d6a",
+      "sha256": "33433a07b30f2d67512f56c39ff201e04756b172b7f142f86f3ff73f399bb844"
+    },
+    {
+      "name": "greet",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/greet.d6a",
+      "destination": "/actions/greet.d6a",
+      "sha256": "cd29f4d15fea155142a39026086dbe0bc0950317eea4ddda0966300295d11ddc"
+    },
+    {
+      "name": "hand_back",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/hand_back.d6a",
+      "destination": "/actions/hand_back.d6a",
+      "sha256": "8f131cf506c555d9419afa87aeb9a8fbbb74edc787da2f0117c57eee02f5e503"
+    },
+    {
+      "name": "hand_open",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/hand_open.d6a",
+      "destination": "/actions/hand_open.d6a",
+      "sha256": "480e0ba1809ea3e46c3c43b9c78350e8f43b49753d5171bd4f9b115ac67c5843"
+    },
+    {
+      "name": "hurdles",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/hurdles.d6a",
+      "destination": "/actions/hurdles.d6a",
+      "sha256": "061cd2aa9de64ab0c007961b4765a5ba18bd8c49c72e5d3f52d5cacb9b9b2bb3"
+    },
+    {
+      "name": "left_hand_put_block",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/left_hand_put_block.d6a",
+      "destination": "/actions/left_hand_put_block.d6a",
+      "sha256": "f4a293d5c95d90f7d3bac15411981217dc6b7362959bde17b62fe0f6ba223227"
+    },
+    {
+      "name": "left_shot",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/left_shot.d6a",
+      "destination": "/actions/left_shot.d6a",
+      "sha256": "a14933d412877ef6e9514e07ecbc7910f6ed416e4ff8a3befe376895904217eb"
+    },
+    {
+      "name": "lie_to_stand",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/lie_to_stand.d6a",
+      "destination": "/actions/lie_to_stand.d6a",
+      "sha256": "af64d589a363356992db7ad009965c4f408cf4a2fa6836877fa9303d3fd14737"
     },
     {
       "name": "move_left",
-      "source": "simulation/artifacts/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/move_left.d6a",
-      "destination": "simulation/actiongroups/move_left.d6a",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/move_left.d6a",
+      "destination": "/actions/move_left.d6a",
       "sha256": "0fc65a93d3ca347a48c43d64aeab6db9113650088326e7e421cd0f2fa20d1234"
     },
     {
       "name": "move_right",
-      "source": "simulation/artifacts/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/move_right.d6a",
-      "destination": "simulation/actiongroups/move_right.d6a",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/move_right.d6a",
+      "destination": "/actions/move_right.d6a",
       "sha256": "2c61704c12390473d903e6cd4b3f142bf1b9d87aa9121624da91cf2e501ba688"
     },
     {
-      "name": "back_step",
-      "source": "simulation/artifacts/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/back_step.d6a",
-      "destination": "simulation/actiongroups/back_step.d6a",
-      "sha256": "b410c2b34b443d0beec77988f655eb15f3fdfcf89df217a5ed67039ea6c4aa2b"
+      "name": "move_up",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/move_up.d6a",
+      "destination": "/actions/move_up.d6a",
+      "sha256": "3a5f8958e11e33c318ef862fcc7e06b7f1fe896892fd2326c6d77a63e9174575"
+    },
+    {
+      "name": "place_block",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/place_block.d6a",
+      "destination": "/actions/place_block.d6a",
+      "sha256": "902702310bc4784490098f8ee9f9c9c024f4e1bcef493dd2e605cde9f9fa4422"
+    },
+    {
+      "name": "put_down",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/put_down.d6a",
+      "destination": "/actions/put_down.d6a",
+      "sha256": "f35ab3d0631cef4d38e69f1d3a6d29fa27921b8cbf81ed0c4b12a281f3e16115"
+    },
+    {
+      "name": "raise_right_hand",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/raise_right_hand.d6a",
+      "destination": "/actions/raise_right_hand.d6a",
+      "sha256": "9f471e065022cd190cbcf2a61390d8affb783a6a9f297cfde5e3cebfc0ec19ae"
+    },
+    {
+      "name": "recline_to_stand",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/recline_to_stand.d6a",
+      "destination": "/actions/recline_to_stand.d6a",
+      "sha256": "454f00a0284c5c7bbec5d26906ec67dba2328cbd22f90a1abb1c64aa6253ac34"
+    },
+    {
+      "name": "right_hand_put_block",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/right_hand_put_block.d6a",
+      "destination": "/actions/right_hand_put_block.d6a",
+      "sha256": "3b24e41bfa347c831eaab3e1ae0c9113f789b06f28009e4ff468e8313ad43e54"
+    },
+    {
+      "name": "right_shot",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/right_shot.d6a",
+      "destination": "/actions/right_shot.d6a",
+      "sha256": "d99cd1f75d099428b40cbff59fc7d1cd9d74a9e637867e0313d17672f1804dc2"
+    },
+    {
+      "name": "stair_down",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/stair_down.d6a",
+      "destination": "/actions/stair_down.d6a",
+      "sha256": "9dfcb2c07019560f84f4548e32c463af270ad023003ddb8ed928c20b21749c21"
+    },
+    {
+      "name": "stair_up",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/stair_up.d6a",
+      "destination": "/actions/stair_up.d6a",
+      "sha256": "b7cdc4b73ea4a2605ff4a732fb48d5ae3b737a17fd506208f34f43edaab57d58"
+    },
+    {
+      "name": "stand",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/stand.d6a",
+      "destination": "/actions/stand.d6a",
+      "sha256": "a5ea33a29e2ef231aeec07e187151ef3c99e0b6ead92a3340dee8785ef30a718"
+    },
+    {
+      "name": "stand_low",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/stand_low.d6a",
+      "destination": "/actions/stand_low.d6a",
+      "sha256": "ae6e8fd7826129c6927cefaff74c7f457490f130351dfaa71b50bb07b2146cae"
+    },
+    {
+      "name": "temp",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/temp.d6a",
+      "destination": "/actions/temp.d6a",
+      "sha256": "64359cf6df61a71a880cf98ffa15278e1320654c754dca1dbb621d55d0936258"
+    },
+    {
+      "name": "turn_left",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/turn_left.d6a",
+      "destination": "/actions/turn_left.d6a",
+      "sha256": "6136e924895118f21fdffac464a78fbe4aca0c11ce6cb082f6158cc0e2311b69"
+    },
+    {
+      "name": "turn_left_30",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/turn_left_30.d6a",
+      "destination": "/actions/turn_left_30.d6a",
+      "sha256": "7de2ca3ab58485cefc7c626ccc04910062294aa2dc96ccf2fa0645cd6c49bfd2"
+    },
+    {
+      "name": "turn_right",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/turn_right.d6a",
+      "destination": "/actions/turn_right.d6a",
+      "sha256": "95cc2b16d29f64889ed683923a8c1a7d8d04022c840e05d81ad3d8d9da1cc39a"
+    },
+    {
+      "name": "turn_right_30",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/turn_right_30.d6a",
+      "destination": "/actions/turn_right_30.d6a",
+      "sha256": "634e2a6d019d60209eb2e5936abb26d2bb7a522a7f5a857d3c45be73906532a8"
+    },
+    {
+      "name": "twist",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/twist.d6a",
+      "destination": "/actions/twist.d6a",
+      "sha256": "7ce5e73a233698aa8f514e78260601df933e1d6eaad2cd622d9b504a679ac2fe"
+    },
+    {
+      "name": "walk_ready",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/walk_ready.d6a",
+      "destination": "/actions/walk_ready.d6a",
+      "sha256": "125766caff5ca1931982932ed2128bcf0b3b811d1af2d0cccc77e320b2ac76b9"
+    },
+    {
+      "name": "wave",
+      "source": "robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/wave.d6a",
+      "destination": "/actions/wave.d6a",
+      "sha256": "30a2790a695c78efebe7ad72a8c5631038660fc73fb99d75c828ebd810e308e0"
     }
   ]
 }

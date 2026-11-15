@@ -2,6 +2,7 @@
 set -euo pipefail
 sim_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 project_dir=$(dirname -- "$sim_dir")
+default_actions_dir="$project_dir/robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups"
 image=humanoid-ainex:noetic-gazebo
 container=humanoid-ainex-sim
 command=${1:-help}
@@ -93,7 +94,7 @@ case "$command" in
         if [[ "$command" == smoke ]]; then anchored=true; fi
         [[ "$anchored" == true || "$anchored" == false ]] || \
             fail 'ROBOTRIO_ANCHORED must be true or false.'
-        actions_dir=${ROBOTRIO_ACTIONS_DIR:-"$sim_dir/actiongroups"}
+        actions_dir=${ROBOTRIO_ACTIONS_DIR:-"$default_actions_dir"}
         while [[ $# -gt 0 ]]; do
             case "$1" in
                 --gui)
@@ -123,9 +124,6 @@ case "$command" in
                 *) fail "Unknown startup option: $1. Use --gui, --free, --anchored and/or --actions-dir PATH." ;;
             esac
         done
-        if [[ "$actions_dir" == "$sim_dir/actiongroups" ]]; then
-            mkdir -p "$actions_dir"
-        fi
         [[ -d "$actions_dir" && -r "$actions_dir" && -x "$actions_dir" ]] || \
             fail "ActionGroups directory is not readable: $actions_dir. Mount an existing .d6a directory with --actions-dir PATH."
         actions_dir=$(cd -- "$actions_dir" && pwd -P)
@@ -208,7 +206,8 @@ case "$command" in
         printf 'Usage: bash simulation/sim.sh {fetch|build|smoke|up|gui|shell|logs|status|action|list-actions|action-info|stop-action|line-follow|line-stop|line-view|stop}\n'
         printf '  up [--gui] [--anchored] [--actions-dir PATH]  Start free Gazebo (headless by default).\n'
         printf '  gui [--anchored] [--actions-dir PATH]        Start free Gazebo with local GUI.\n'
-        printf '  ROBOTRIO_ACTIONS_DIR sets the default .d6a directory (otherwise simulation/actiongroups).\n'
+        printf '  Default .d6a directory: %s\n' "${default_actions_dir#"$project_dir/"}"
+        printf '  ROBOTRIO_ACTIONS_DIR overrides the default .d6a directory.\n'
         printf '  --anchored explicitly fixes the body above ground; --free explicitly removes the fixture.\n'
         printf '  status prints initial_pose_ready/error; free actions wait for verified stand.\n'
         printf '  ROBOTRIO_SERVO_CONFIG optionally mounts an absolute servo_controller.yaml path read-only.\n'

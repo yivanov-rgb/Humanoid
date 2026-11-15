@@ -25,6 +25,10 @@ for key in ('init_actions', 'init_servo_config'):
 xml = subprocess.check_output(['xacro'] + arguments, universal_newlines=True)
 robot = ET.fromstring(xml)
 align_servo_model(robot)
+# Original crawl_left/right require knee flexion of 127.2 degrees (pulses 770/230).
+# Extend only flexion limits before the stand offsets are applied below.
+robot.find("joint[@name='l_knee']/limit").set('upper', '2.23')
+robot.find("joint[@name='r_knee']/limit").set('lower', '-2.23')
 mount_camera_on_head(robot)
 # Tiny finger inertias cannot use the arm's large, discontinuous dry friction.
 # ODE joint damping is implicit; retain a controllable revolute joint.

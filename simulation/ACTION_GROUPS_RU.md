@@ -11,11 +11,15 @@
 
 ## Источники и формат
 
-Основной источник: `simulation/artifacts/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/`.
-Инвентаризация описывает 48 действий; девять действий линии выбраны для
-`simulation/actiongroups`. Выгрузка, архив и эти локальные копии не хранятся
-в Git и должны быть получены с робота отдельно.
-[Полная инвентаризация](actiongroups_manifest.json), [выборка и SHA256](actiongroups_selection.json).
+Основной источник: `robot/ActionGroups/d6a_from_robot/home/ubuntu/software/ainex_controller/ActionGroups/`.
+Все 48 исходных действий хранятся в Git и по умолчанию подключаются симуляцией
+только для чтения как `/actions`, без копирования и изменения `.d6a`.
+[Список всех подключённых групп и SHA256](actiongroups_selection.json) указывает
+пути исходников (`source`) и файлов в контейнере (`destination`).
+[Историческая инвентаризация](actiongroups_manifest.json) описывает исходную
+выгрузку; пути в её записях относятся к расположению при анализе архива.
+Локальные копии в `simulation/actiongroups/` и архив в `simulation/artifacts/`
+не хранятся в Git.
 Исходный архив `simulation/artifacts/ainex_d6a.tar.gz` содержал 98 файлов: 48 основных,
 48 резервных из `action_bk` и две записи из `.ros`.
 При наличии этого архива восстановление выполняется из корня проекта:
