@@ -186,16 +186,19 @@ class Runner:
     def fresh_frames(self):
         self.frames.reset(self.ros.Time.now().to_nsec())
 
+    def motion_actions(self):
+        actions = {'stand'}
+        if not self.args.prepare_only:
+            actions.update(('move_left', 'move_right', 'forward_one_step', 'back_step',
+                            'crouch', 'clamp_right_crouch'))
+        return actions
+
     def setup_motion(self):
         from ainex_kinematics.motion_manager import MotionManager
         from ainex_interfaces.srv import SetWalkingCommand
         if self.ros.get_param('/use_sim_time', False):
             raise RuntimeError('Этот скрипт предназначен для физического робота')
-        actions = {'stand'}
-        if not self.args.prepare_only:
-            actions.update(('move_left', 'move_right', 'forward_one_step', 'back_step',
-                            'crouch', 'clamp_right_crouch'))
-        for name in sorted(actions):
+        for name in sorted(self.motion_actions()):
             path = Path(self.args.action_path) / (name + '.d6a')
             if not path.is_file():
                 raise RuntimeError('Нет ActionGroup: ' + str(path))

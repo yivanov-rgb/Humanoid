@@ -14,6 +14,7 @@ ROS 1 Noetic, штатные драйверы HiWonder, камера и ActionGr
 | Просмотр камеры | [Видеопоток через SSH](#видеопоток-камеры-через-ssh) | Просмотр на ноутбуке через работающий `web_video_server` |
 | Центрирование метки головой | [tag_track.py](tag_track.py), [запуск](#отслеживание-apriltag-головой) | Наблюдение по умолчанию; движение только с `--execute`; физически ещё не проверен |
 | Первый этап захвата | [tag_grab_approach.py](tag_grab_approach.py), [запуск](#первый-этап-захвата-по-ориентации-тега) | ID 0: поворот рисунка → выбор руки → подход → присед; углы рук нужно измерить |
+| Второй этап захвата | [tag_grab_crouch.py](tag_grab_crouch.py), [запуск](#второй-этап-коррекция-в-приседе-и-захват) | Подшаги влево/вправо из приседа → захват выбранной рукой и подъём; пороги X пока вокруг центра кадра |
 | Подход к кубу | [tag_grab.py](tag_grab.py), [ограничения и запуск](#захват-по-apriltag-текущие-ограничения) | Текущая версия останавливается после измерений в приседе; окончательный захват и перенос недоступны |
 | Следование линии | [line_follow.py](line_follow.py), [запуск](#следование-линии-line_followpy) | Наблюдение по умолчанию; ходьба через пять штатных ActionGroups; на роботе ещё не подтверждён |
 | Размещение куба | [ActionGroups и исходные позы](#размещение-куба-одной-рукой) | Разделённые траектории подготовлены; автоматического позиционирования по пазу пока нет |
@@ -38,7 +39,7 @@ Python-точка входа для команд ниже. Прежний сце
 
 ```bash
 read -r -p 'SSH-адрес робота user@IP: ' ROBOT_SSH
-scp robot/line_follow.py robot/tag_grab.py robot/tag_grab_approach.py robot/tag_track.py "$ROBOT_SSH":/tmp/
+scp robot/line_follow.py robot/tag_grab.py robot/tag_grab_approach.py robot/tag_grab_crouch.py robot/tag_track.py "$ROBOT_SSH":/tmp/
 ssh "$ROBOT_SSH"
 ```
 
@@ -49,6 +50,7 @@ docker exec ainex mkdir -p /home/ubuntu/robotrio
 docker cp /tmp/line_follow.py ainex:/home/ubuntu/robotrio/line_follow.py
 docker cp /tmp/tag_grab.py ainex:/home/ubuntu/robotrio/tag_grab.py
 docker cp /tmp/tag_grab_approach.py ainex:/home/ubuntu/robotrio/tag_grab_approach.py
+docker cp /tmp/tag_grab_crouch.py ainex:/home/ubuntu/robotrio/tag_grab_crouch.py
 docker cp /tmp/tag_track.py ainex:/home/ubuntu/robotrio/tag_track.py
 docker exec -it ainex bash
 ```
@@ -62,6 +64,7 @@ cd /home/ubuntu/robotrio
 python3 line_follow.py --help
 python3 tag_grab.py --help
 python3 tag_grab_approach.py --help
+python3 tag_grab_crouch.py --help
 python3 tag_track.py --help
 ```
 
@@ -73,7 +76,7 @@ python3 tag_track.py --help
 
 ## Распознавание AprilTag без движения
 
-`tag_track.py`, `tag_grab.py` и `tag_grab_approach.py` читают готовые обнаружения,
+`tag_track.py`, `tag_grab.py`, `tag_grab_approach.py` и `tag_grab_crouch.py` читают готовые обнаружения,
 но сами не запускают детектор. Ниже — запуск штатного детектора HiWonder в **ROS 1 Noetic внутри
 контейнера `ainex` физического робота**. Команды не управляют сервоприводами.
 
@@ -338,10 +341,71 @@ python3 -u tag_grab_approach.py --execute \
 до таймаута. Те же ориентиры без `--execute` позволяют наблюдать выбор руки.
 
 Успех первого этапа обозначается `CROUCHED` с выбранной рукой. Робот остаётся
-в приседе, камера — в 500/330. Второй этап с дополнительным прицеливанием,
-захватом и подъёмом отложен. При потере цели во время подхода, ошибке или Ctrl+C
+в приседе, камера — в 500/330. Затем можно запустить
+[второй этап](#второй-этап-коррекция-в-приседе-и-захват), передав выбранную руку.
+При потере цели во время подхода, ошибке или Ctrl+C
 следующие команды прекращаются, автоматического вставания нет.
 Новый сценарий на физическом роботе ещё не проверен.
+
+## Второй этап: коррекция в приседе и захват
+
+`tag_grab_crouch.py` запускается после успешного `CROUCHED` первого этапа:
+робот уже в приседе, камера в **500/330**, груз перед ним. `--hand left|right`
+должен совпадать с рукой из журнала первого этапа; повторного выбора по углу нет.
+Скрипт использует `tag_grab_approach.py` как модуль: оба файла нужно скопировать
+рядом по [общей инструкции](#подготовка-окружения-и-копирование-скриптов).
+Он не вызывает `stand`, повторный присед или шаги вперёд/назад и не устанавливает
+голову заново. Требования к детектору те же: один ID **0**, **tag36h11**, 640×480.
+
+При `--execute` X ниже нижнего порога вызывает `step_to_left`, выше верхнего —
+`step_to_right`. После каждого подшага и паузы `--settle` нужны новые изображения.
+Решение подтверждают `--stable-frames` последовательных свежих кадров (по умолчанию 3).
+Попадание X в диапазон включает границы; затем один раз вызывается
+`clamp_left_from_crouch` или `clamp_right_from_crouch`, включая штатный подъём.
+Y записывается в журнал, но не ограничивает захват и не вызывает движения по глубине.
+
+Начальные пороги обеих рук — **X=310…330**, вокруг центра кадра **320**.
+Это стартовые значения для подбора на месте, а не измеренная область захвата.
+Настройте их независимо через `--left-x-min/--left-x-max` и
+`--right-x-min/--right-x-max`. По умолчанию лимит — 10 подшагов, потеря цели —
+10 с, общее время — 180 с; параметры: `--max-moves`, `--lost-timeout`, `--timeout`.
+Потеря/неоднозначность цели сбрасывает подтверждение. При ошибке, достижении
+лимита или Ctrl+C следующие команды прекращаются без автоматического вставания.
+
+В `--action-path` (по умолчанию `/home/ubuntu/software/ainex_controller/ActionGroups`)
+нужны `step_to_left.d6a`, `step_to_right.d6a` и захват для выбранной руки.
+Пользовательские `step_to_left/right` пока отсутствуют в репозитории;
+используются установленные на роботе файлы с этими точными именами.
+Группы `move_left/right_from_crouch` не заменяют их.
+Продолжения захвата из репозитория при необходимости скопируйте с ноутбука:
+
+```bash
+scp robot/ActionGroups/clamp_left_from_crouch.d6a robot/ActionGroups/clamp_right_from_crouch.d6a "$ROBOT_SSH":/tmp/
+ssh "$ROBOT_SSH" 'docker cp /tmp/clamp_left_from_crouch.d6a ainex:/home/ubuntu/software/ainex_controller/ActionGroups/clamp_left_from_crouch.d6a'
+ssh "$ROBOT_SSH" 'docker cp /tmp/clamp_right_from_crouch.d6a ainex:/home/ubuntu/software/ainex_controller/ActionGroups/clamp_right_from_crouch.d6a'
+```
+
+После подготовки окружения внутри `ainex` выберите команду для руки из `CROUCHED`.
+Сначала наблюдение без движения, остановка — Ctrl+C:
+
+```bash
+python3 -u tag_grab_crouch.py --hand left
+# Если первый этап выбрал RIGHT:
+python3 -u tag_grab_crouch.py --hand right
+```
+
+Затем коррекция и захват; запустите только нужный вариант:
+
+```bash
+python3 -u tag_grab_crouch.py --execute --hand left --left-x-min 310 --left-x-max 330
+# Или для RIGHT:
+python3 -u tag_grab_crouch.py --execute --hand right --right-x-min 310 --right-x-max 330
+```
+
+`GRASP_SEQUENCE_DONE` означает завершение воспроизведения захвата и подъёма;
+обратной связи об удержании груза нет. Второй этап на физическом роботе ещё
+не проверен. Офлайн-проверки без ROS, симуляции и движений, из корня проекта:
+`python3 -m unittest discover -s robot -p 'test_tag_grab_crouch.py'`.
 
 ## Захват по AprilTag: текущие ограничения
 
